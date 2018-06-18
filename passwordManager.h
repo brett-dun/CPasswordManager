@@ -51,9 +51,9 @@ void generateNewPassword();
 void changeMasterPassword();
 
 long randLong(const long max);
-char* readFile(const char* fileName);
+void readFile(char** result, unsigned long* length, const char* fileName);
 void writeFile(const char* text, const size_t length, const char* fileName);
-char* reverseEncryption(const char* text, const char* cipher);
+char* reverseEncryption(const char* text, const unsigned long textLength, const char* cipher, const unsigned long cipherLength);
 char* generateNewCipher(const size_t length);
 void parseAccounts(const char* str);
 

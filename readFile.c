@@ -2,56 +2,49 @@
 #include "passwordManager.h"
 
 //this sometimes doesn't read the file correctly
-char* readFile(const char* fileName) {
+void readFile(char** result, unsigned long* length, const char* fileName) {
 
-	char* str;
-	char ch;
-	size_t size = 16;
-	size_t length = 0;
-
-	//allocate room for up to 16 characters
-	str = malloc(sizeof(char) * size);
+	//free(result);
 
 	FILE* file;
 
-	if( access( fileName, F_OK ) != -1 ) {
+	if ( access( fileName, F_OK ) != -1 ) {
 
 		file = fopen(fileName, "rb");
 
-		//printf("reading file\n");
-		while ((ch = getc(file)) != EOF) {
+		fseek(file, 0, SEEK_END);
 
-		    str[length++] = ch;
+		*length = ftell(file);
 
-		    printf("%d ", ch);
+		//printf("%lu\n", *length);
 
-		    //printf("%c", ch);
+		*result = malloc(*length);
 
-			if (length == size) {
-				//allocate room for another 16 characters
-				str = realloc(str, sizeof(char) * (size+=16));
-					
-				//check for null
-				if(!str)
-					return str;
-			}
+		//printf("%s\n", *result);
 
+		//printf("memory allocated\n");
+
+		if ( fseek(file, 0L, SEEK_SET) != 0 ) {
+			printf("Failure");
 		}
+
+		int temp = fread(*result, sizeof(char), (*length)+1, file);
+
+		//printf("%s\n", *result);
+
+		//printf("file read\n");
 
 		//Close the file
 		fclose(file);
+		//printf("file closed\n");
 
-		//Add a null terminator
-		str[length++] = '\0';
+		//printf("%s\n", *result);
 
-		printf("\n");
+		
 
-		//return a char* that doesn't use excess memory
-		return realloc(str, sizeof(char) * length);
+	} else
 
-	} else {
 		printf("Failure");
-		return str;
-	}
+
 
 }
