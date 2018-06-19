@@ -1,7 +1,7 @@
 
 #include "passwordManager.h"
 
-
+const char* SETTINGS_PATH = "Desktop/settings.data";
 const char* CIPHER_PATH = "Desktop/cipher.data";
 const char* PASSWORD_MANAGER_PATH = "Desktop/passwordManager.data";
 
@@ -11,15 +11,16 @@ short lowercase = 1;
 short numbers = 1;
 short specialCharacters = 1;
 
-unsigned long cipherLength;
-
 /*
 	Bugs/Features to Add
-	- Fix encryption/decryption -> figure out how to determine the length of the char*
 	- Allow accounts to be deleted
+	- Store password generation settings
 */
 
 int main(int argc, char* argv[]) {
+
+	//length of the cipher
+	unsigned long cipherLength;
 
 	//cipher used for encrypting usernames and passwords
 	char* decryptedCipher;
@@ -29,7 +30,8 @@ int main(int argc, char* argv[]) {
 
 	printf("PASSWORD MANAGER\n");
 
-	if ( access( PASSWORD_MANAGER_PATH , F_OK ) == -1 || access( CIPHER_PATH , F_OK ) == -1 ) {
+	//if the files cannot be found
+	if ( access( PASSWORD_MANAGER_PATH , F_OK ) == -1 || access( CIPHER_PATH , F_OK ) == -1 /*|| access( SETTINGS_PATH, F_OK ) != -1*/ ) {
 
 		printf("Welcome...\n");
 		printf("Please set a master password:\n");
@@ -47,36 +49,25 @@ int main(int argc, char* argv[]) {
 		//read the master password from the console
 		masterPassword = inputString(stdin);
 
-		//printf("reading cipher\n");
-
+		//the cipher that has not yet been decrypted
 		char* encryptedCipher;
 
+		//read the encrypted cipher
 		readFile(&encryptedCipher, &cipherLength, CIPHER_PATH);
-
-		//printf("%s\n", encryptedCipher);
-		//printf("%lu\n", cipherLength);
-
-		//printf("file 1 read\n");
 
 		//open the file that contains the encrypted cipher and decrypt it using the master password
 		decryptedCipher = reverseEncryption( encryptedCipher, cipherLength, masterPassword , strlen(masterPassword));
-
-		//printf("reading text\n");
 
 		char* encryptedText;
 		unsigned long encryptedTextLength;
 
 		readFile(&encryptedText, &encryptedTextLength, PASSWORD_MANAGER_PATH);
 
-		//printf("file 2 read\n");
-
 		//open the file that contains the encrypted usernames and passwords and decrypt it using the cipher
 		decryptedText = reverseEncryption( encryptedText, encryptedTextLength, decryptedCipher, cipherLength);
 
 		//parse decrypted text into accounts array
 		parseAccounts(decryptedText);
-
-		//printf("%s\n", readFile("Desktop/test.txt"));
 
 	}
 
@@ -126,6 +117,7 @@ int main(int argc, char* argv[]) {
 	free(decryptedText);
 	decryptedText = malloc( sizeof(char)*4*256 );
 
+	//concatenate all of the dat from the accounts together
 	for (int i = 0; i < accountsLength; i++) {
 		strcat(decryptedText, accounts[i].accountName);
 		strcat(decryptedText, "\t");
@@ -137,69 +129,22 @@ int main(int argc, char* argv[]) {
 		strcat(decryptedText, "\n");
 	}
 
+	//append null terminating character
 	strcat(decryptedText, "\0");
 
+	//reallocate memory to save space
 	decryptedText = realloc(decryptedText, strlen(decryptedText)+1);
 
-	printf("%s\n", decryptedText);
-
-	//printf("%s\n", decryptedText);
-
-	//generate new cipher text each time the program exits
+	//generate new cipher text each time the program exits correctly
 	decryptedCipher = generateNewCipher( strlen(decryptedText) );
+	//store the length of the cipher
 	cipherLength = strlen(decryptedText);
 
-	//printf("here\n");
-
-	/*char* eText = reverseEncryption(decryptedText, decryptedCipher);
-
-	//printf("or here\n");
-
-	char* eCipher = reverseEncryption(decryptedCipher, masterPassword);
-
-	char* dCipher = reverseEncryption(eCipher, masterPassword);
-	//printf("dCipher: %s\n", dCipher);
-
-	char* dText = reverseEncryption(eText, dCipher);
-
-	//printf("or maybe here\n");
-
-	printf("dText: %s\n", dText);*/
-
-	//writeFile(temp2, "Desktop/test.txt");*/
-	/*char* temp = malloc(10);
-
-	for (char i = 0; i < 10; i++)
-		temp[i] = i;
-
-	writeFile(temp, "Desktop/test.bin");*/
-
-	//printf("writing text\n");
 	//encrypt the text with the cipher and sotre it to the password manager file
 	writeFile( reverseEncryption(decryptedText, strlen(decryptedText), decryptedCipher, cipherLength), strlen(decryptedText), PASSWORD_MANAGER_PATH );
 
-	/*char* temp = reverseEncryption(decryptedText, decryptedCipher);
-	for (int i = 0; i < strlen(decryptedText)+1; i++)
-		printf("%d ", temp[i]);
-	printf("\n");*/
-
-	//printf("%s\n", reverseEncryption(temp, decryptedCipher));
-
-	/*
-
-	"Floating point exception: 8" occurs sometime arround here
-	- Doesn't occur every time, it may be an issue with how many accounts exist
-	- has worked when there are multiple accounts
-
-	- the cipher isn't the same length as the text for some reason
-
-	*/
-
-	//printf("writing cipher\n");
-
 	//encrypt the cipher text using the master password and write it to the cipher file
 	writeFile( reverseEncryption(decryptedCipher, cipherLength, masterPassword, strlen(masterPassword)), strlen(decryptedText)+1, CIPHER_PATH);
-
 
 	//free the memory allocated to pointers by malloc and realloc
 	free(masterPassword);

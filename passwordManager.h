@@ -28,8 +28,7 @@ extern const char* PASSWORD_MANAGER_PATH;
 //password that unlocks the cipher
 char* masterPassword;
 
-//array of Account structs which is used to store data from decrypted text in a way that is easier to modify and update
-//Account (*accounts)[];
+//pointer to an array of Account structs which is used to store data from decrypted text in a way that is easier to modify and update
 Account* accounts;
 unsigned long accountsLength;
 
@@ -43,12 +42,12 @@ extern short specialCharacters;
 //Function prototypes
 char* inputString(FILE* fp);
 
-void displayHelp();
-void viewAccounts();
-void addNewAccount();
-void modifyExistingAccount();
-void generateNewPassword();
-void changeMasterPassword();
+void displayHelp(void);
+void viewAccounts(void);
+void addNewAccount(void);
+void modifyExistingAccount(void);
+void generateNewPassword(void);
+void changeMasterPassword(void);
 
 long randLong(const long max);
 void readFile(char** result, unsigned long* length, const char* fileName);
@@ -56,5 +55,6 @@ void writeFile(const char* text, const size_t length, const char* fileName);
 char* reverseEncryption(const char* text, const unsigned long textLength, const char* cipher, const unsigned long cipherLength);
 char* generateNewCipher(const size_t length);
 void parseAccounts(const char* str);
+
 
 #endif

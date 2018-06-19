@@ -1,34 +1,41 @@
 
 #include "passwordManager.h"
 
-//does not parse accounts properly
+/*
+	Parameters:
+		const char* str = the string that needs to be parsed for accounts
+*/
 void parseAccounts(const char* str) {
 
-	printf("%s\n", str);
-	
+	//number of accounts currently stored
 	accountsLength = 0;
 
+	//char* array to hold account name, username, password, and notes
 	char* buffer[4];
-	//unsigned long bufferLength = 0;
 
-	unsigned int counter = 0;
+	//variable to maintain the currect place when reading char* str
+	unsigned long counter = 0;
 
+	//while a null character has not been found
 	while (str[counter] != '\0') {
 
-		//buffer[bufferLength++] = malloc(256*4+3+1);
+		//allocate the maximum storage that the variable could possibly need
+		//consider allocating less than adding more as we go
 		char* temp = malloc(256*4+3+1);
 
+		//integer to hold position of where characters get placed
 		unsigned int i;
 
 		for (i = 0; i < 256*4+3 && str[counter] != '\n'; i++, counter++)
 			temp[i] = str[counter];
 
+		//append a null character to the end
 		temp[++i] = '\0';
 
+		//reallocate memory to save space
 		temp = realloc(temp, i);
 
-		printf("%c\n", str[counter]);
-
+		//I think this if statement can just be removed
 		if (str[counter] != '\n' && str[counter] != '\0') {
 
 			printf("FAILURE\n");
@@ -37,123 +44,45 @@ void parseAccounts(const char* str) {
 		}
 		counter++;
 
-		printf("%s\n\n", temp);
-
+		//a variable to maintain position in the char* temp
 		unsigned int tempCounter = 0;
 
 		for (i = 0; i < 4; i++) {
 
+			//allocate the maximum possible storage needed
 			buffer[i] = malloc(256+1);
 
+			//variable for the position of the character that is going to be appended
 			unsigned int j;
-			for (j = 0; temp[tempCounter] != '\t' && temp[tempCounter] != '\0'; j++) {
-
+			//iterate through the char* adding characters to the buffer while a tab or null character is not encountered
+			for (j = 0; temp[tempCounter] != '\t' && temp[tempCounter] != '\0'; j++)
 				buffer[i][j] = temp[tempCounter++];
 
-			}
-
+			//append a null character to the end of the string
 			buffer[i][++j] = '\0';
 
+			//reallocate the memory so that none is wasted
 			buffer[i] = realloc(buffer[i], j);
 
-			printf("%u :: %s\n", i, buffer[i]);
-
+			//move to the next character's position
 			tempCounter++;
 
 		}
 
+		//at least one account already exists
 		if (accountsLength++)
+			//reallocate the memory
 			accounts = realloc(accounts, accountsLength*sizeof(Account));
 		else
+			//allocate memory for the first time
 			accounts = malloc(sizeof(Account));
 
+		//store the text from the buffer into the struct
 		accounts[accountsLength-1].accountName = buffer[0];
 		accounts[accountsLength-1].username = buffer[1];
 		accounts[accountsLength-1].password = buffer[2];
 		accounts[accountsLength-1].notes = buffer[3];
 
 	}
-
-	/*while (1) {
-
-		printf("accountsLength: %lu\n", accountsLength);
-		
-		short tabs = 0;
-
-		for (int i = 0; i < 4; i++) {
-
-			printf("%d\n", i);
-
-			buffer[i] = malloc(256);
-
-			int j;
-			for (j = 0; j < 256 && str[counter] != '\t' && str[counter] != '\n' && str[counter] != '\0'; j++, counter++) {
-				printf("counter: %d\n", counter);
-				buffer[i][j] = str[counter];
-			}
-
-			if (str[counter] == '\t')
-				tabs++;
-			else if (str[counter] == '\0') {
-				printf("return\n");
-				return;
-			}
-
-			buffer[i][++j] = '\0';
-			buffer[i] = realloc(buffer[i], j);
-
-			counter++;
-
-			printf("tabs: %d; buffer[%d]: %s\n", tabs, i, buffer[i]);
-
-			printf("i: %d\n", i);
-
-		}
-
-		printf("%c,%d\n", str[counter], tabs);
-
-		if (str[counter] == '\n' && tabs == 0) {
-
-			printf("return\n");
-			return;
-
-		} else if (str[counter] == '\n' && tabs != 3) {
-
-			printf("Either the master password was incorrect or a file has become corrupted.\n");
-			exit(EXIT_FAILURE);
-
-		} else {
-
-			if (accountsLength++) {
-
-				accounts = realloc(accounts, accountsLength*sizeof(Account));
-
-			} else {
-
-				accounts = malloc(accountsLength*sizeof(Account));
-
-			}
-
-			accounts[accountsLength-1].accountName = buffer[0];
-			accounts[accountsLength-1].username = buffer[1];
-			accounts[accountsLength-1].password = buffer[2];
-			accounts[accountsLength-1].notes = buffer[3];
-
-		}
-
-		counter++;
-
-	}*/
-
-	/*//buffer[0] = malloc(strlen(str)+1);
-	while (str[counter] != '\0') 
-		printf("%c", str[counter++]);
-	printf("\n");
-
-	counter = 0;
-	while (str[counter] != '\0') 
-		printf("%d ", str[counter++]);
-	printf("\n");*/
-	//exit(EXIT_FAILURE);
 
 }
