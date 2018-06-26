@@ -13,8 +13,10 @@ short specialCharacters = 1;
 
 /*
 	Bugs/Features to Add
-	- Allow accounts to be deleted
 	- Store password generation settings
+	- Fix bugs that cause an infinite loop
+	- Allocate only the needed amount of memory
+	- (!) Fix issue with random data being appended to file (possibly something to do with '\0')
 */
 
 int main(int argc, char* argv[]) {
@@ -83,24 +85,28 @@ int main(int argc, char* argv[]) {
 			case '1':
 				viewAccounts();
 				break;
-			//generate a new password
-			case '2':
-				generateNewPassword();
-				break;
 			//add new account
-			case '3':
+			case '2':
 				addNewAccount();
 				break;
 			//modify existing account
-			case '4':
+			case '3':
 				modifyExistingAccount();
 				break;
-			//change the master password
+			//delete existing account
+			case '4':
+				deleteAccount();
+				break;
+			//generate a new password
 			case '5':
+				generateNewPassword();
+				break;
+			//change the master password
+			case '6':
 				changeMasterPassword();
 				break;
 			//exit and save
-			case '6':
+			case '7':
 				exit = 1;
 				break;
 			//show the help menu	

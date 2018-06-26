@@ -20,7 +20,7 @@ void addNewAccount(void) {
 	scanf(" %s", tempAccount.accountName);
 	tempAccount.accountName = realloc(tempAccount.accountName, strlen(tempAccount.accountName)+1);
 
-	printf("Account username:");
+	printf("Account username:\n");
 	//change this to use inputString(stdin)
 	tempAccount.username = malloc(256);
 	scanf(" %s", tempAccount.username);
